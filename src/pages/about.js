@@ -1,5 +1,5 @@
-export const aboutPage = () => {
-    return `
+const about = () => {
+    return <template>
        <h1>Your are on About Page!</h1>
-    `
+    </template>
 }
