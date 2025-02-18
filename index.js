@@ -15,7 +15,13 @@ if (!fs.existsSync(distDir)) {
 const getPagesPath = (dir) => {
     let pages = []
     fs.readdirSync(dir).forEach(page => {
-        pages.push(page)
+        const pagePath = path.join(dir, page)
+        if (fs.statSync(pagePath).isDirectory()) {
+            fs.mkdirSync(path.join(distDir, pagePath.replace("src/pages", "")))
+            pages = pages.concat(getPagesPath(pagePath))
+        } else {
+            pages.push(pagePath.replace("src/pages/", ""))
+        }
     })
     return pages
 }
@@ -24,7 +30,8 @@ const generateDist = () => {
     const pagesPath = getPagesPath("src/pages")
     for (let i = 0; i < pagesPath.length; i++) {
         const pagePath = pagesPath[i];
-        const fileName = "dist/" + pagePath.replace(".js", ".html")
+        const fileName = path.join("dist",pagePath.replace(".js", ".html"))
+        console.log(`src/pages/${pagePath}`, fileName)
         fs.writeFileSync(fileName, fs.readFileSync(`src/pages/${pagePath}`, "utf8"), (err) => {
             if (err) {
                 console.log("error when building your app: " + err)
